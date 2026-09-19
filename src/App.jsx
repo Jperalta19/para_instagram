@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import JSZip from 'jszip'
-import { ChevronDown, CircleHelp, FileArchive, FileUp, Instagram, LoaderCircle, RotateCcw, UserRoundX, Users, X } from 'lucide-react'
+import { ChevronDown, CircleHelp, FileArchive, FileUp, Instagram, LoaderCircle, RotateCcw, UserPlus, UserRoundX, Users, X } from 'lucide-react'
 
 const GROUP_SIZE = 100
 
@@ -13,8 +13,12 @@ function normalizeRelations(data) {
   return relations
     .map((relation) => {
       const item = relation?.string_list_data?.[0] ?? relation
-      const username = item?.value ?? relation?.title
-      return username ? { username, href: item?.href ?? '' } : null
+      const labelValues = Array.isArray(relation?.label_values) ? relation.label_values : Array.isArray(item?.label_values) ? item.label_values : []
+      const usernameEntry = labelValues.find((entry) => entry?.label && /username/i.test(entry.label))
+      const urlEntry = labelValues.find((entry) => entry?.label && /url/i.test(entry.label))
+      const username = item?.value ?? relation?.title ?? relation?.username ?? usernameEntry?.value ?? ''
+      const href = item?.href ?? urlEntry?.value ?? ''
+      return username ? { username: String(username).trim(), href: String(href).trim() } : null
     })
     .filter(Boolean)
     .filter((user, index, users) => users.findIndex((candidate) => candidate.username === user.username) === index)
@@ -30,14 +34,16 @@ async function readInstagramZip(file) {
   const zip = await JSZip.loadAsync(file)
   const jsonFiles = Object.keys(zip.files).filter((name) => name.toLowerCase().endsWith('.json'))
   const followerFile = jsonFiles.find((name) => /followers(?:_\d+)?\.json$/i.test(name))
-  const followingFile = jsonFiles.find((name) => /following\.json$/i.test(name))
-  if (!followerFile && !followingFile) {
-    throw new Error('No se encontraron followers_*.json ni following.json dentro del ZIP.')
+  const followingFile = jsonFiles.find((name) => /following(?:_\d+)?\.json$/i.test(name))
+  const pendingFollowRequestsFile = jsonFiles.find((name) => /pending_follow_requests(?:_\d+)?\.json$/i.test(name))
+  if (!followerFile && !followingFile && !pendingFollowRequestsFile) {
+    throw new Error('No se encontraron followers_*.json, following*.json ni pending_follow_requests*.json dentro del ZIP.')
   }
   return {
     followers: followerFile ? await readJsonEntry(zip, followerFile) : [],
     following: followingFile ? await readJsonEntry(zip, followingFile) : [],
-    files: { followerFile, followingFile },
+    pendingFollowRequests: pendingFollowRequestsFile ? await readJsonEntry(zip, pendingFollowRequestsFile) : [],
+    files: { followerFile, followingFile, pendingFollowRequestsFile },
   }
 }
 
@@ -208,14 +214,16 @@ function App() {
               <div><span className="file-label">Archivo cargado</span><strong>{fileName}</strong></div>
               <span className="summary-ready">Listo</span>
             </div>
-            <div className="stats-row">
+            <div className="stats-row stats-row-four">
               <div><span>Seguidores</span><strong>{relations.followers.length.toLocaleString('es-ES')}</strong></div>
               <div><span>Siguiendo</span><strong>{relations.following.length.toLocaleString('es-ES')}</strong></div>
+              <div><span>Pendientes</span><strong>{relations.pendingFollowRequests.length.toLocaleString('es-ES')}</strong></div>
               <div><span>No te siguen</span><strong>{notFollowingBack.length.toLocaleString('es-ES')}</strong></div>
             </div>
             <div className="relations-stack">
               <RelationPanel title="Seguidores" eyebrow="People who follow you" icon={Users} users={relations.followers} accent="panel-coral" />
               <RelationPanel title="Siguiendo" eyebrow="People you follow" icon={Users} users={relations.following} accent="panel-teal" />
+              <RelationPanel title="Solicitudes pendientes" eyebrow="Follow requests waiting for approval" icon={UserPlus} users={relations.pendingFollowRequests} accent="panel-violet" />
               <RelationPanel title="No te siguen de vuelta" eyebrow="You follow, they don't follow you" icon={UserRoundX} users={notFollowingBack} accent="panel-amber" />
             </div>
           </>

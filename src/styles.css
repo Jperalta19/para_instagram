@@ -38,6 +38,7 @@ h1 em { color: #c7614e; font-style: normal; }
 .file-label { display: block; color: #969990; font-size: 9px; }
 .summary-ready { margin-left: auto; color: #3e9582; font-family: 'DM Mono', monospace; font-size: 11px; text-transform: uppercase; }
 .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); border-bottom: 1px solid #d9d4c9; margin-bottom: 24px; }
+.stats-row-four { grid-template-columns: repeat(4, 1fr); }
 .stats-row div { padding: 24px 18px 20px 0; }
 .stats-row div + div { border-left: 1px solid #d9d4c9; padding-left: 24px; }
 .stats-row span { display: block; color: #858980; font-size: 12px; margin-bottom: 7px; }
@@ -47,7 +48,10 @@ h1 em { color: #c7614e; font-style: normal; }
 .panel-heading { width: 100%; display: flex; align-items: center; gap: 14px; text-align: left; border: 0; padding: 18px 20px; background: transparent; color: #202321; cursor: pointer; }
 .panel-heading:hover { background: rgba(255,255,255,.34); }
 .panel-icon { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; }
-.panel-coral .panel-icon { background: #f1d4c7; color: #a54f40; }.panel-teal .panel-icon { background: #cde1d9; color: #2f7565; }.panel-amber .panel-icon { background: #eadcb8; color: #8a6a25; }
+.panel-coral .panel-icon { background: #f1d4c7; color: #a54f40; }
+.panel-teal .panel-icon { background: #cde1d9; color: #2f7565; }
+.panel-violet .panel-icon { background: #e0d9f7; color: #5f4b9f; }
+.panel-amber .panel-icon { background: #eadcb8; color: #8a6a25; }
 .panel-title-wrap { display: grid; gap: 2px; }.panel-eyebrow { color: #92958d; font-size: 9px; }.panel-title { font-family: 'Space Grotesk', sans-serif; font-size: 21px; font-weight: 600; }
 .panel-count { margin-left: auto; font-family: 'DM Mono', monospace; color: #737870; font-size: 13px; }.panel-chevron { color: #7b8078; transition: transform .2s; }.panel-chevron.is-open { transform: rotate(180deg); }
 .panel-body { padding: 0 20px 20px; }.user-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); border-top: 1px solid #d9d4c9; }
