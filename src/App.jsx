@@ -133,8 +133,13 @@ function App() {
   const [error, setError] = useState('')
   const [fileName, setFileName] = useState('')
   const [showHelp, setShowHelp] = useState(false)
+
+  const followersSet = relations
+    ? new Set(relations.followers.map((follower) => usernameKey(follower.username)))
+    : new Set()
+
   const notFollowingBack = relations
-    ? relations.following.filter((user) => !relations.followers.some((follower) => usernameKey(follower.username) === usernameKey(user.username)))
+    ? relations.following.filter((user) => !followersSet.has(usernameKey(user.username)))
     : []
 
   async function handleFile(file) {
